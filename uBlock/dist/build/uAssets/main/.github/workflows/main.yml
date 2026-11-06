@@ -1,0 +1,69 @@
+name: Deploy to gh-pages branch
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-only-cancel-in-progress-jobs-or-runs-for-the-current-workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    permissions:
+      contents: write  # for Git to git push
+    name: Publish lists
+    runs-on: ubuntu-slim
+    steps:
+      - name: Repo check
+        run: |
+          if [[ "$GITHUB_REPOSITORY_OWNER" != "uBlockOrigin" ]]; then
+            echo "This GitHub Action is meant to build filter lists for uBO."
+            echo "You shouldn't need to run this GitHub Action in your fork."
+            echo "If you do, please customize the cron expression above, and"
+            echo "the URLs below."
+            exit 1
+          fi
+          exit 0
+      - name: Clone uAssets
+        uses: actions/checkout@v4
+        with:
+            ref: gh-pages
+      - name: Copy filter lists to gh-pages
+        run: |
+          TMPDIR=$(mktemp -d)
+          git clone --depth=1 https://github.com/uBlockOrigin/uAssets.git $TMPDIR
+          pushd $TMPDIR > /dev/null
+          ./tools/make-ublock.sh
+          popd > /dev/null
+          cp $TMPDIR/filters/*.txt filters/
+          cp $TMPDIR/thirdparties/easylist/easy*.txt thirdparties/
+          cp $TMPDIR/dnr/*.json dnr/
+      - name: Patch last-updated field
+        run: |
+          DATE=$(date -Ru)
+          for f in $(git diff --name-only); do
+            STAT=$(git diff --numstat $f | sed -r '/^1\s+1\s+/d')
+            if [[ -n $STAT ]]; then
+              sed -ir "0,/^! Last modified: /s/^\(! Last modified: \)%timestamp%/\\1$DATE/" $f
+            else
+              git checkout -q $f
+            fi
+          done
+      - name: Commit changes (if any)
+        run: |
+          if [[ -n $(git diff) ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -u filters/
+            git add -u thirdparties/
+            git add -u dnr/
+            git commit -m "Update modified filter lists"
+            git push origin gh-pages
+          fi

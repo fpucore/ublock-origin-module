@@ -1,0 +1,378 @@
+! Title: FSF-oriented Proprietary JS Filter
+! Description: Curated filters for scripts and telemetry endpoints operated by proprietary software vendors. Selection is vendor-oriented, not solely behavior-based.
+! Homepage: https://www.github.com/fpucore
+! License: CC-BY-4.0
+! Version: 0.1.1
+! Last modified: 2026-11-06
+!
+! Filter behaviour:
+! - Rules without redirect= block matching requests.
+! - redirect=noop.js blocks the original request and substitutes uBO's noop.js resource.
+! - Redirecting a script does not preserve its functionality; dependent site features may break.
+! - $image rules block matching image requests, typically tracking pixels.
+!
+! Redirect rules use uBO's built-in redirect resource token; no separate dashboard toggle is required.
+!
+!########## Google: Analytics, Tag Manager, Ads ##########
+
+||google-analytics.com^$script,third-party
+||ssl.google-analytics.com^$script,third-party
+||www.google-analytics.com^$script,third-party
+||analytics.google.com^$script,third-party
+||region1.google-analytics.com^$script,third-party
+||stats.g.doubleclick.net^$script,third-party
+||googletagmanager.com^$script,third-party
+||www.googletagservices.com^$script,third-party
+||googletagservices.com^$script,third-party
+||optimize.google.com^$script,third-party
+||adservice.google.com^$script,third-party
+||googleadservices.com^$script,third-party
+||googleads.g.doubleclick.net^$script,third-party
+||pagead2.googlesyndication.com^$script,third-party
+||tpc.googlesyndication.com^$script,third-party
+||securepubads.g.doubleclick.net^$script,third-party
+||googlesyndication.com^$script,third-party
+||doubleclick.net^$script,third-party
+||imasdk.googleapis.com^$script,third-party
+
+!########## Google: reCAPTCHA (proprietary, widely used) ##########
+!# redirect, not block: blocking hard breaks most sign-up and contact forms.
+
+||recaptcha.net^$script,third-party,redirect=noop.js
+||www.recaptcha.net^$script,third-party,redirect=noop.js
+||www.google.com/recaptcha/$script,third-party,redirect=noop.js
+
+!########## Meta / Facebook ##########
+
+||connect.facebook.net^$script,third-party,redirect=noop.js
+||static.xx.fbcdn.net^$script,third-party,redirect=noop.js
+||graph.facebook.com^$script,third-party
+||facebook.com/tr^$image,third-party
+
+!########## Microsoft / Bing ##########
+
+||bat.bing.com^$script,third-party
+||c.bing.com^$script,third-party
+||clarity.ms^$script,third-party
+||c.clarity.ms^$script,third-party
+
+!########## Twitter / X ##########
+
+||platform.twitter.com^$script,third-party,redirect=noop.js
+||ads-twitter.com^$script,third-party
+||static.ads-twitter.com^$script,third-party
+||analytics.twitter.com^$script,third-party
+
+!########## LinkedIn ##########
+
+||snap.licdn.com^$script,third-party
+||px.ads.linkedin.com^$script,third-party
+||platform.linkedin.com^$script,third-party,redirect=noop.js
+||ads.linkedin.com^$script,third-party
+
+!########## TikTok ##########
+
+||analytics.tiktok.com^$script,third-party
+||business-api.tiktok.com^$script,third-party
+||script.tiktokcdn.com^$script,third-party
+
+!########## Snap ##########
+
+||sdk.snapkit.com^$script,third-party,redirect=noop.js
+||static.snapchat.com^$script,third-party
+
+!########## Pinterest / Reddit / Pinterest tag ##########
+
+||assets.pinterest.com^$script,third-party
+||s.pinimg.com/ct/^$script,third-party
+||alb.reddit.com^$image,third-party
+||www.redditstatic.com/ads/^$script,third-party
+
+!########## Yandex Metrica ##########
+
+||mc.yandex.ru^$script,third-party
+||mc.yandex.com^$script,third-party
+||yandex.ru/metrika^$script,third-party
+
+!########## Session replay / heatmaps / UX analytics ##########
+!# These read keystrokes and page content. High priority.
+
+||hotjar.com^$script,third-party
+||static.hotjar.com^$script,third-party
+||script.hotjar.com^$script,third-party
+||in.hotjar.com^$script,third-party
+||mouseflow.com^$script,third-party
+||cdn.mouseflow.com^$script,third-party
+||fullstory.com^$script,third-party
+||fullstory.io^$script,third-party
+||cdn.fullstory.com^$script,third-party
+||sessioncam.com^$script,third-party
+||cdn.sessioncam.com^$script,third-party
+||inspectlet.com^$script,third-party
+||cdn.inspectlet.com^$script,third-party
+||clicktale.net^$script,third-party
+||cdn.clicktale.net^$script,third-party
+||luckyorange.com^$script,third-party
+||cs.luckyorange.com^$script,third-party
+||crazyegg.com^$script,third-party
+||script.crazyegg.com^$script,third-party
+||contentsquare.net^$script,third-party
+||cdn.contentsquare.net^$script,third-party
+||quantum-metric.com^$script,third-party
+||cdn.quantum-metric.com^$script,third-party
+||clicky.com^$script,third-party
+||static.getclicky.com^$script,third-party
+||statcounter.com^$script,third-party
+||hit.gem.pl^$script,third-party
+
+!########## Product analytics / CDP ##########
+
+||mixpanel.com^$script,third-party
+||cdn.mxpnl.com^$script,third-party
+||amplitude.com^$script,third-party
+||api.amplitude.com^$script,third-party
+||cdn.amplitude.com^$script,third-party
+||heap.io^$script,third-party
+||cdn.heapanalytics.com^$script,third-party
+||segment.com^$script,third-party
+||cdn.segment.com^$script,third-party
+||api.segment.io^$script,third-party
+||api-js.mixpanel.com^$script,third-party
+||api.mparticle.com^$script,third-party
+||nativesdks.mparticle.com^$script,third-party
+||app-measurement.com^$script,third-party
+||firebaseinstallations.googleapis.com^$script,third-party
+||kit.com^$script,third-party
+||static.getkit.com^$script,third-party
+
+!########## APM / RUM / error tracking ##########
+
+||newrelic.com^$script,third-party
+||js-agent.newrelic.com^$script,third-party
+||bam.nr-data.net^$script,third-party
+||browser.datadoghq.com^$script,third-party
+||cdn.datadoghq.com^$script,third-party
+||js-cdn.dynatrace.com^$script,third-party
+||rum.browser-intake-datadoghq.com^$script,third-party
+
+!########## Advertising exchanges and DSPs ##########
+
+||adnxs.com^$script,third-party
+||ib.adnxs.com^$script,third-party
+||secure.adnxs.com^$script,third-party
+||adsrvr.org^$script,third-party
+||ib.adnxs.com/utag.js^$script,third-party
+||openx.net^$script,third-party
+||c.us.openx.net^$script,third-party
+||us-u.openx.net^$script,third-party
+||adsystem.com^$script,third-party
+||adform.net^$script,third-party
+||track.adform.net^$script,third-party
+||s.adform.net^$script,third-party
+||adsmatic.com^$script,third-party
+||smartadserver.com^$script,third-party
+||ads.smtdm.com^$script,third-party
+||rubiconproject.com^$script,third-party
+||fastlane.rubiconproject.com^$script,third-party
+||pubmatic.com^$script,third-party
+||image8.pubmatic.com^$script,third-party
+||ad.cpmstar.com^$script,third-party
+||criteo.com^$script,third-party
+||static.criteo.net^$script,third-party
+||sslwidget.criteo.com^$script,third-party
+||taboola.com^$script,third-party
+||cdn.taboola.com^$script,third-party
+||trc.taboola.com^$script,third-party
+||outbrain.com^$script,third-party
+||widgets.outbrain.com^$script,third-party
+||log.outbrain.com^$script,third-party
+||sharethrough.com^$script,third-party
+||cdn.sharethrough.com^$script,third-party
+||casalemedia.com^$script,third-party
+||ssl.widget.casalemedia.com^$script,third-party
+||teads.tv^$script,third-party
+||a.teads.tv^$script,third-party
+||p.teads.tv^$script,third-party
+||cdn.teads.tv^$script,third-party
+||spotxchange.com^$script,third-party
+||d.spotxchange.com^$script,third-party
+||sizmek.com^$script,third-party
+||ads.sizmek.com^$script,third-party
+||aniview.com^$script,third-party
+||s.aniview.com^$script,third-party
+||33across.com^$script,third-party
+||assets.33across.com^$script,third-party
+||ad.yieldmo.com^$script,third-party
+||cdn.yieldmo.com^$script,third-party
+||gumgum.com^$script,third-party
+||sovrn.com^$script,third-party
+||lax1.c.sovrn.com^$script,third-party
+||adsafeprotected.com^$script,third-party
+||fw.adsafeprotected.com^$script,third-party
+||serving-sys.com^$script,third-party
+||cdn.serving-sys.com^$script,third-party
+||media.net^$script,third-party
+||static.media.net^$script,third-party
+||bidr.io^$script,third-party
+||bluekai.com^$script,third-party
+||tags.tiqcdn.com^$script,third-party
+||demdex.net^$script,third-party
+||dpm.demdex.net^$script,third-party
+||everesttech.net^$script,third-party
+||assets.everesttech.net^$script,third-party
+||omtrdc.net^$script,third-party
+||sc.omtrdc.net^$script,third-party
+||agkn.com^$script,third-party
+||ads.omtrdc.net^$script,third-party
+||rlcdn.com^$script,third-party
+||idsync.rlcdn.com^$script,third-party
+||2o7.net^$script,third-party
+||adroll.com^$script,third-party
+||s.adroll.com^$script,third-party
+||zedo.com^$script,third-party
+||p.zedo.com^$script,third-party
+||adblade.com^$script,third-party
+||cdn.adblade.com^$script,third-party
+||mgid.com^$script,third-party
+||static.mgid.com^$script,third-party
+||ad.mgid.com^$script,third-party
+||contextweb.com^$script,third-party
+||bidswitch.net^$script,third-party
+||api.bidmatrix.io^$script,third-party
+
+!########## Pop-unders, redirects, aggressive monetisation ##########
+
+||popads.net^$script,third-party
+||cdn.popads.net^$script,third-party
+||propellerads.com^$script,third-party
+||cdn.propellerads.com^$script,third-party
+||propellerclick.com^$script,third-party
+||clickadu.com^$script,third-party
+||cdn.clickadu.com^$script,third-party
+||exoclick.com^$script,third-party
+||bbs.exoclick.com^$script,third-party
+||adcash.com^$script,third-party
+||cdn.adcash.com^$script,third-party
+||adsterra.com^$script,third-party
+||cdn.adsterra.com^$script,third-party
+||hilltopads.com^$script,third-party
+||cdn.hilltopads.com^$script,third-party
+||monetag.com^$script,third-party
+||cdn.monetag.com^$script,third-party
+||zerads.com^$script,third-party
+||cdn.zerads.com^$script,third-party
+||adskeeper.com^$script,third-party
+
+!########## Chat, helpdesk and CRM widgets ##########
+!# redirect: blocking removes contact forms and live chat entirely.
+
+||intercom.io^$script,third-party,redirect=noop.js
+||widget.intercom.io^$script,third-party,redirect=noop.js
+||zdassets.com^$script,third-party,redirect=noop.js
+||static.zdassets.com^$script,third-party,redirect=noop.js
+||js.zdassets.com^$script,third-party,redirect=noop.js
+||driftt.com^$script,third-party,redirect=noop.js
+||js.driftt.com^$script,third-party,redirect=noop.js
+||crisp.chat^$script,third-party,redirect=noop.js
+||client.crisp.chat^$script,third-party,redirect=noop.js
+||tawk.to^$script,third-party,redirect=noop.js
+||embed.tawk.to^$script,third-party,redirect=noop.js
+||olark.com^$script,third-party,redirect=noop.js
+||livechatinc.com^$script,third-party,redirect=noop.js
+||freshdesk.com^$script,third-party,redirect=noop.js
+||zohostatic.com^$script,third-party,redirect=noop.js
+||zopim.com^$script,third-party,redirect=noop.js
+
+!########## Marketing automation ##########
+
+||hs-scripts.com^$script,third-party
+||js.hs-scripts.com^$script,third-party
+||js.hs-analytics.net^$script,third-party
+||track.hubspot.com^$script,third-party
+||js.hsforms.net^$script,third-party
+||js.hsleadflows.net^$script,third-party
+||mailchimp.com^$script,third-party
+||static.mailchimp.com^$script,third-party
+||list-manage.com^$script,third-party
+||klaviyo.com^$script,third-party
+||static.klaviyo.com^$script,third-party
+||sendinblue.com^$script,third-party
+||static.sb-blue.com^$script,third-party
+||munchkin.marketo.com^$script,third-party
+||munchkin.brightfunnel.com^$script,third-party
+||eloqua.com^$script,third-party
+||s3.amazonaws.com/analytics.sndr^$script,third-party
+||marketo.net^$script,third-party
+||pardot.com^$script,third-party
+||pi.pardot.com^$script,third-party
+
+!########## Consent / fingerprinting / bot-detection ##########
+
+||js.hcaptcha.com^$script,third-party,redirect=noop.js
+||hcaptcha.com^$script,third-party,redirect=noop.js
+||api.hcaptcha.com^$script,third-party,redirect=noop.js
+||cdn.perimeterx.com^$script,third-party
+||px-cdn.perimeterx.com^$script,third-party
+||fpjs.io^$script,third-party
+||cdn.fpjs.io^$script,third-party
+||fingerprintjs.com^$script,third-party
+
+!########## Commercial video players ##########
+!# redirect: these are functional embeds, not telemetry.
+
+||youtube.com/iframe_api^$script,third-party,redirect=noop.js
+||www.youtube.com/embed_api^$script,third-party,redirect=noop.js
+||player.vimeo.com^$script,third-party,redirect=noop.js
+||player.vimeo.com/video/$script,third-party,redirect=noop.js
+||content.jwplatform.com^$script,third-party,redirect=noop.js
+||players.brightcove.net^$script,third-party,redirect=noop.js
+||fast.wistia.net^$script,third-party,redirect=noop.js
+||fast.wistia.com^$script,third-party,redirect=noop.js
+||cdn.kaltura.com^$script,third-party,redirect=noop.js
+||cdnapisec.kaltura.com^$script,third-party,redirect=noop.js
+||cdn.flowplayer.com^$script,third-party,redirect=noop.js
+||flowplayer.com^$script,third-party,redirect=noop.js
+
+!########## Ad creative and verification scripts ##########
+
+||moatads.com^$script,third-party
+||js.moatads.com^$script,third-party
+||scorecardresearch.com^$script,third-party
+||quantserve.com^$script,third-party
+||ssc.qdoubleclick.com^$script,third-party
+||cdn.adsrvr.org^$script,third-party
+||acs.metricool.com^$script,third-party
+||tagmanager.tiqcdn.com^$script,third-party
+
+!########## Proprietary telemetry beacons ##########
+
+||google-analytics.com^$image,third-party
+||google-analytics.com/collect^$xhr,third-party
+||stats.g.doubleclick.net^$image,third-party
+||facebook.com/px^$image,third-party
+||analytics.tiktok.com^$xhr,third-party
+||bat.bing.com^$image,third-party
+||px.ads.linkedin.com^$image,third-party
+||ads.linkedin.com^$xhr,third-party
+||snap.licdn.com^$xhr,third-party
+||mc.yandex.ru^$image,third-party
+||insight.hotjar.com^$xhr,third-party
+||in.hotjar.com^$xhr,third-party
+||vars.hotjar.com^$xhr,third-party
+||rs.fullstory.com^$xhr,third-party
+||edge.fullstory.com^$xhr,third-party
+||heapanalytics.com^$xhr,third-party
+||api.segment.io^$xhr,third-party
+||api.amplitude.com^$xhr,third-party
+||mixpanel.com/api^$xhr,third-party
+||api-js.mixpanel.com^$xhr,third-party
+||app-measurement.com^$xhr,third-party
+||hm.baidu.com^$image,third-party
+||log.outbrain.com^$xhr,third-party
+||trc.taboola.com^$xhr,third-party
+||c.bing.com^$image,third-party
+||id.google-analytics.com^$xhr,third-party
+||analytics.google.com^$xhr,third-party
+||bam.nr-data.net^$xhr,third-party
+||browser-intake-datadoghq.com^$xhr,third-party
+||in.appcenter.ms^$xhr,third-party

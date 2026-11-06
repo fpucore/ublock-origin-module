@@ -1,0 +1,21 @@
+name: on-issue-comment
+on:
+  issue_comment:
+    types: created
+jobs:
+  check-if-bad-comment:
+    name: delete bad comment
+    runs-on: ubuntu-latest
+    if: (( contains(github.event.comment.body, 'Download') || contains(github.event.comment.body, 'install') || contains(github.event.comment.body, 'mediafire') || contains(github.event.comment.body, 'changeme') ) && ( contains(github.event.comment.body, 'gcc') || contains(github.event.comment.body, 'usx'))) || ( contains(github.event.comment.body, 'install') && ( contains(github.event.comment.body, 'mediafire') || contains(github.event.comment.body, 'gofile') ))
+    permissions: write-all
+    steps:
+      - name: Delete comment
+        env:
+          BODY: ${{ github.event.comment.body }}
+        run: |
+          echo " $BODY "
+      - uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'delete-comment'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-id: ${{ github.event.comment.id }}
