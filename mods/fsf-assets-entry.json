@@ -1,0 +1,10 @@
+{
+    "fsf-proprietary": {
+        "content": "filters",
+        "group": "default",
+        "title": "FSF-oriented Proprietary JS Filter",
+        "tags": "privacy security",
+        "updateAfter": 28,
+        "contentURL": "assets/fsf/fsf-oriented-proprietary-js-filter-v0.1.1.txt"
+    }
+}

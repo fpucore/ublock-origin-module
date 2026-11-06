@@ -1,0 +1,130 @@
+#!/usr/bin/env raku
+
+#
+#    uBlock Origin (for H Navigator)
+#        Guided by FSF principles for JavaScript freedom.
+#    
+#    Copyright (C) 2026 Chris McGimpsey-Jones
+#    Copyright (C) 2014-2026 Raymond Hill
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see {http://www.gnu.org/licenses/}.
+#
+
+use v6;
+
+# =========================
+# Configuration
+# =========================
+my Str $ubo-git-url    = "https://github.com/gorhill/uBlock.git";
+my Str $base-dir       = "{$*HOME}/Blackbox-hwm/Downloads/uBlock";
+my Str $repo-dir       = "{$base-dir}/uBlock";
+my Str $mods-dir       = "{$base-dir}/mods";
+
+# =========================
+# Helper: run command safely
+# =========================
+sub run-or-die(*@cmd) {
+    say "Running: " ~ @cmd.join(' ');
+    my $proc = run |@cmd, :out, :err;
+    my $exitcode = $proc.exitcode;
+
+    if $exitcode != 0 {
+        my $stderr = $proc.err.slurp-rest // '';
+        die "Command failed (@cmd[]) with exit code {$exitcode}:\n{$stderr}";
+    }
+}
+
+# =========================
+# Dependency checks
+# =========================
+for <git make python3> -> $cmd {
+    my $check = run 'which', $cmd, :out, :err;
+    if $check.exitcode != 0 {
+        die "Required command not found: {$cmd}";
+    }
+}
+
+# =========================
+# Prepare directories
+# =========================
+mkdir $base-dir unless $base-dir.IO.e;
+mkdir $mods-dir unless $mods-dir.IO.e;
+
+# =========================
+# Fetch or Clone Repository
+# =========================
+if $repo-dir.IO.e && "$repo-dir/.git".IO.e {
+    say "Cleaning up previous modifications...";
+    run-or-die 'git', '-C', $repo-dir, 'reset', '--hard';
+    
+    say "Pulling latest changes in $repo-dir";
+    run-or-die 'git', '-C', $repo-dir, 'pull';
+} else {
+    say "Cloning repository to $repo-dir";
+    run-or-die 'git', 'clone', $ubo-git-url, $repo-dir;
+}
+
+# =========================
+# Inject Custom Modifications
+# =========================
+say "Injecting custom modifications from $mods-dir";
+my $custom-manifest = "$mods-dir/manifest.json";
+my $custom-about    = "$mods-dir/about.html";
+my $custom-version  = "$mods-dir/version";
+
+my $target-manifest = "$repo-dir/platform/chromium/manifest.json";
+my $target-about    = "$repo-dir/src/about.html";
+my $target-version  = "$repo-dir/dist/version";
+
+if $custom-manifest.IO.e {
+    say "Copying modified manifest.json...";
+    copy $custom-manifest, $target-manifest;
+} else {
+    say "Warning: Custom manifest.json not found in $mods-dir. Skipping.";
+}
+
+if $custom-about.IO.e {
+    say "Copying modified about.html...";
+    copy $custom-about, $target-about;
+} else {
+    say "Warning: Custom about.html not found in $mods-dir. Skipping.";
+}
+
+if $custom-version.IO.e {
+    say "Copying custom version file...";
+    # The dist directory might not exist yet on a fresh clone before 'make' is run
+    mkdir "$repo-dir/dist" unless "$repo-dir/dist".IO.e;
+    copy $custom-version, $target-version;
+} else {
+    say "Warning: Custom version file not found in $mods-dir. Skipping.";
+}
+
+# =========================
+# Inject FSF Proprietary Filter
+# =========================
+say "Injecting FSF custom filter and asset definitions...";
+
+run-or-die 'python3',
+    "$mods-dir/inject-fsf.py",
+    $repo-dir,
+    $mods-dir;
+
+# =========================
+# Compile Extension
+# =========================
+say "Compiling H Navigator extension...";
+# Use 'make -C' to execute the Makefile inside the target repository
+run-or-die 'make', '-C', $repo-dir, 'chromium';
+
+say "Compile complete. The unpacked extension is located at: {$repo-dir}/dist/build/uBlock0.chromium";
